@@ -1,0 +1,2 @@
+AddHandler php53-script .php
+suPHP_ConfigPath /home/betinalimpeza/

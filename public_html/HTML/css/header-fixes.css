@@ -1,0 +1,171 @@
+/* ===== HEADER LAYOUT FIX ===== */
+
+/* Main header inner container: 3-column layout (logo | center | delivery) */
+.elementor-location-header .e-con-inner {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 15px !important;
+}
+
+/* --- COLUMN 1: Logo (left) --- */
+.elementor-element-ced437c {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.elementor-element-ced437c img {
+    max-width: 250px !important;
+    height: auto !important;
+}
+
+/* --- COLUMN 2: Phones + Social + Catálogo (center) --- */
+.elementor-element-74a0efe {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    flex-wrap: wrap !important;
+    flex: 1 1 auto !important;
+}
+
+/* Phone button font sizes */
+.elementor-element-4c83635 .elementor-button-text {
+    font-size: 19px !important;
+}
+
+.elementor-element-ad13425 .elementor-button-text {
+    font-size: 19px !important;
+}
+
+.elementor-element-e041347 .elementor-button-text {
+    font-size: 22px !important;
+}
+
+/* Social icons - keep inline with phones */
+.elementor-element-5949f2f {
+    flex: 0 0 auto !important;
+}
+
+/* --- Catálogo button: force below phones, centered on page --- */
+.elementor-element-deaf877 {
+    /* Break it to its own line within the flex parent */
+    flex-basis: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    order: 10 !important;
+    margin-top: 5px !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.elementor-element-deaf877 .elementor-button-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+    transform: translateX(-80%) !important;
+}
+
+.elementor-element-deaf877 .elementor-button {
+    font-size: 120% !important;
+    padding: 14px 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* --- COLUMN 3: Delivery icon (right, much smaller) --- */
+.elementor-element-ecfbd5c {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    flex: 0 0 auto !important;
+    max-width: 100px !important;
+}
+
+/* Make delivery icon image much smaller */
+.elementor-element-ecfbd5c .elementor-element-dd597b9 {
+    max-width: 90px !important;
+    width: 90px !important;
+}
+
+.elementor-element-ecfbd5c .elementor-element-dd597b9 img {
+    width: 100% !important;
+    max-width: 160px !important;
+    height: auto !important;
+    transform: translateX(150%) translateY(40%) scale(1.5) !important;
+    transform-origin: center center !important;
+}
+
+.elementor-element-ecfbd5c .elementor-element-1638098 {
+    transform: translateY(400%) !important;
+    transform-origin: top center !important;
+}
+
+/* "Entrega Rápida" text smaller */
+.elementor-element-ecfbd5c .elementor-element-1638098 .elementor-heading-title {
+    font-size: 14px !important;
+    transform: translateX(140%) scale(1.0) !important;
+    white-space: nowrap !important;
+}
+
+/* ===== RESPONSIVE: TABLET ===== */
+@media (max-width: 1200px) {
+    .elementor-location-header .e-con-inner {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+
+    .elementor-element-ced437c {
+        width: 100% !important;
+        justify-content: center !important;
+        margin-bottom: 10px !important;
+    }
+
+    .elementor-element-74a0efe {
+        width: 100% !important;
+        justify-content: center !important;
+        margin-bottom: 10px !important;
+    }
+
+    .elementor-element-ecfbd5c {
+        max-width: 80px !important;
+    }
+}
+
+/* ===== RESPONSIVE: MOBILE ===== */
+@media (max-width: 768px) {
+    .elementor-location-header .e-con-inner {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .elementor-element-74a0efe {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .elementor-element-ecfbd5c {
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex-direction: row !important;
+    }
+
+    .elementor-element-ecfbd5c .elementor-element-dd597b9 {
+        max-width: 40px !important;
+        width: 40px !important;
+    }
+
+    .elementor-element-ced437c img {
+        max-width: 80% !important;
+        height: auto !important;
+    }
+}

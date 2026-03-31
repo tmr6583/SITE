@@ -1,0 +1,6 @@
+AddHandler php56-script .php
+suPHP_ConfigPath /home/betinalimpeza/
+
+RewriteEngine on
+RewriteCond $1 !^(index\.php|lib|robots\.txt|info.php|locaweb)
+RewriteRule ^(.*)$ index.php/$1 [L]

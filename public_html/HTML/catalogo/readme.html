@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readme - Betina Limpeza Catálogo</title>
+    <style>
+        :root {
+            --primary: #003399;
+            --bg-body: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background: var(--bg-body);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        h2 { color: var(--primary); margin-top: 30px; }
+        code { background: #e2e8f0; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+        pre { background: #1e293b; color: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .feature-list, .tech-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .card h3 { margin-top: 0; font-size: 1.1rem; }
+        footer { margin-top: 50px; text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>Betina Limpeza | Catálogo Digital</h1>
+    <p>Uma solução leve e eficiente para pedidos online via WhatsApp, desenvolvida para facilitar a visualização e seleção de produtos de limpeza.</p>
+
+    <h2>🚀 Funcionalidades</h2>
+    <div class="feature-list">
+        <div class="card">
+            <h3>📱 Totalmente Responsivo</h3>
+            <p>Layout adaptável para desktops, tablets e celulares. No mobile, o carrinho se transforma em uma "gaveta" (bottom sheet) moderna e acessível.</p>
+        </div>
+        <div class="card">
+            <h3>🔍 Busca Instantânea</h3>
+            <p>Pesquisa em tempo real por nome, código ou marca, com debouncing para melhor performance.</p>
+        </div>
+        <div class="card">
+            <h3>🛒 Carrinho Dinâmico</h3>
+            <p>Adicione, remova e ajuste quantidades facilmente. O estado do carrinho é mantido durante a navegação na página.</p>
+        </div>
+        <div class="card">
+            <h3>💬 Pedido via WhatsApp</h3>
+            <p>Gera automaticamente uma mensagem formatada com o resumo do pedido e envia diretamente para o WhatsApp da loja.</p>
+        </div>
+        <div class="card">
+            <h3>📊 Exportação Excel</h3>
+            <p>Permite baixar o pedido em formato <code>.xlsx</code> para controle administrativo ou backup do cliente.</p>
+        </div>
+    </div>
+
+    <h2>🛠️ Estrutura do Projeto</h2>
+    <ul>
+        <li><strong>index.html</strong>: Contém toda a estrutura, estilos (CSS) e lógica da aplicação (JavaScript).</li>
+        <li><strong>produtos.js</strong>: Arquivo de dados que alimenta o catálogo. Contém a variável global <code>allProducts</code>.</li>
+        <li><strong>imagens/</strong>: Pasta onde devem ser armazenadas as imagens dos produtos.</li>
+    </ul>
+
+    <h2>💻 Tecnologias Utilizadas</h2>
+    <div class="tech-list">
+        <div class="card"><h3>HTML5 & CSS3</h3><p>Uso de variáveis CSS, Flexbox, Grid e Media Queries.</p></div>
+        <div class="card"><h3>Vanilla JavaScript</h3><p>Lógica pura sem dependência de frameworks pesados (React, Vue, etc).</p></div>
+        <div class="card"><h3>SheetJS (XLSX)</h3><p>Biblioteca leve para geração de planilhas Excel no navegador.</p></div>
+    </div>
+
+    <h2>⚙️ Como Adicionar Produtos</h2>
+    <p>Para adicionar novos produtos, edite o arquivo <code>produtos.js</code> seguindo o padrão JSON:</p>
+    <pre>
+var allProducts = [
+    {
+        "nome": "NOME DO PRODUTO",
+        "codigo": "CÓDIGO123",
+        "imagem": "imagens/nomedearquivo.jpg"
+    },
+    // ... outros produtos
+];</pre>
+
+    <footer>
+        &copy; 2026 Betina Limpeza. Todos os direitos reservados.
+    </footer>
+
+</body>
+</html>
