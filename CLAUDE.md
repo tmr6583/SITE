@@ -6,172 +6,391 @@
 **CMS**: WordPress 6.9.4 (Elementor)  
 **Hospedagem**: Locaweb (Hospedagem Compartilhada)  
 **IP**: 187.45.240.49 (⚠️ **Dinâmico - Pode Mudar**)  
-**Acesso**: SSH + FTP (fallback automático)  
-**Status**: ✅ Operacional (SSH + FTP testados)
+**Acesso**: SSH (3h) + FTP (24/7) com fallback automático  
+**Status**: ✅ Operacional (SSH + FTP + MCP testados)
+**Último Update**: 2026-09-17
 
 ---
 
-## 📦 Ferramentas Disponíveis
+## 🎯 Objetivo
 
-### 1. **MCP Server - Gerenciamento Completo** ⭐ LEIA [MCP.md](MCP.md)
+Manutenção, melhorias e gestão segura do site betinalimpeza.com.br através de MCP Server com acesso SSH/FTP na Locaweb.
+
+---
+
+## 📁 Arquivos Principais
+
+| Arquivo | Propósito | Visibilidade |
+|---------|-----------|--------------|
+| `mcp_locaweb_server.py` | Servidor MCP (SSH+FTP+fallback) | GitHub ✅ |
+| `MCP.md` | Documentação completa (650 linhas) | GitHub ✅ |
+| `.env.example` | Template de configuração segura | GitHub ✅ |
+| `.env` | Credenciais reais (LOCAL APENAS) | .gitignore 🔐 |
+| `COFRE.md` | Backup de credenciais (LOCAL ONLY) | .gitignore 🔐 |
+| `test_mcp.sh` | Script de testes/validação | GitHub ✅ |
+| `CLAUDE.md` | Este arquivo (instruções projeto) | GitHub ✅ |
+| `public_html/` | Arquivos críticos WordPress | GitHub ✅ |
+
+---
+
+## 🚀 Setup Rápido
+
+### 1. Preparar Ambiente
 
 ```bash
-# Setup Inicial
-cp .env.example .env
-# Editar .env com suas credenciais
+cd /c/GitHubLocal/SITE
+
+# Copiar template (já feito)
+# cp .env.example .env
+
+# Carregar credenciais
 source .env
 
-# Testar tudo
+# Verificar SSH ativo no painel (3 horas)
+# https://painelhospedagem.locaweb.com.br/dashboard/8291801
+```
+
+### 2. Testar MCP Server
+
+```bash
+# Executar testes
+bash test_mcp.sh
+
+# OU testar direto
 python mcp_locaweb_server.py
 ```
 
-**Funcionalidades Principais:**
-- ✅ SSH quando habilitado no painel (~3 horas por ativação)
-- ✅ FTP como fallback automático (sempre disponível)
-- ✅ Leitura/escrita de arquivos (SSH → FTP)
-- ✅ Execução de comandos via SSH
-- ✅ Backups e restauração automática
-- ✅ Scans de malware
-- ✅ Health checks WordPress
-- ✅ Detecção automática de IP dinâmico via DNS
+### 3. Usar em Scripts
 
-### 2. **Acesso SSH Direto** (quando habilitado)
+```python
+from mcp_locaweb_server import LocalWebManager
+import os
 
-```bash
-# 1. Habilitar SSH no painel por 3 horas:
-#    https://painelhospedagem.locaweb.com.br/dashboard/8291801
-#    Menu: Hospedagem → Ambientes → Acesso → SSH (ativar)
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")
+manager = LocalWebManager()
 
-# 2. Conectar direto
-ssh -i ~/.ssh/id_rsa_betinalimpeza \
-    -o HostKeyAlgorithms=ssh-rsa \
-    betinalimpeza@187.45.240.49 \
-    "whoami"
-
-# OU usar alias (configurado em ~/.ssh/config):
-ssh betinalimpeza "whoami"
+# Operações disponíveis
+manager.read_file("public_html/wp-config.php")
+manager.write_file("public_html/teste.php", "<?php phpinfo(); ?>")
+manager.delete_file("public_html/arquivo.php")
+manager.list_files("public_html")
+manager.execute_ssh("whoami")  # Só se SSH ativo
+manager.backup_config()
+manager.scan_malware_patterns()
+manager.wordpress_health_check()
 ```
 
-### 3. **Acesso FTP** (sempre disponível)
+---
+
+## 📦 Funcionalidades do MCP Server
+
+### Acesso SSH (Quando Ativo)
+- ✅ Execução de comandos
+- ✅ Máxima velocidade
+- ✅ Operações avançadas
+- ⚠️ Válido por 3 horas (requer ativação manual no painel)
+
+### Acesso FTP (Sempre Disponível)
+- ✅ Leitura/escrita de arquivos
+- ✅ Listagem de diretórios
+- ✅ Sem limite de tempo
+- ✅ Fallback automático se SSH indisponível
+
+### Funcionalidades Complementares
+- ✅ Backups automáticos
+- ✅ Scans de malware
+- ✅ WordPress health checks
+- ✅ Detecção de IP dinâmico via DNS
+- ✅ Integração com Claude Code
+
+---
+
+## 🔐 Credenciais e Segurança
+
+### Localização das Credenciais
+
+```
+.env              ← Arquivo local (NÃO commitar)
+COFRE.md          ← Cópia local (NÃO commitar)
+.env.example      ← Template seguro (PÚBLICO no GitHub)
+```
+
+### Como Usar Credenciais
+
+```bash
+# 1. Verificar COFRE.md para credenciais
+cat COFRE.md
+
+# 2. Usar com variáveis de ambiente
+export BETINA_LOCAWEB_PASSWORD="..."
+export BETINA_LOCAWEB_SSH_ENABLED=true
+
+# 3. OU carregar do .env
+source .env
+```
+
+### ⚠️ Segurança Crítica
+
+- ❌ NUNCA commitar `.env` ou `COFRE.md`
+- ❌ NUNCA compartilhar credenciais em chat/email
+- ❌ NUNCA usar SSH em redes públicas
+- ✅ SEMPRE usar .gitignore
+- ✅ SEMPRE guardar em local seguro
+
+---
+
+## ⚡ Operações Comuns
+
+### Verificar Saúde do WordPress
 
 ```bash
 python << 'PYEOF'
 from mcp_locaweb_server import LocalWebManager
 import os
 
-os.environ["BETINA_LOCAWEB_PASSWORD"] = "Esquilo08!!!!!"
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")
 manager = LocalWebManager()
 
-# Listar arquivos
-result = manager.list_files("public_html")
-for f in result.get("files", []):
-    print(f['name'])
-
-# Ler arquivo
-result = manager.read_file("public_html/wp-config.php")
-print(result["content"][:200])
-
-# Escrever arquivo
-manager.write_file("public_html/teste.php", "<?php phpinfo(); ?>")
-
-# Via SSH (se ativo)
-manager.ssh_enabled = True
-result = manager.execute_ssh("ls -la public_html")
-print(result["stdout"])
+health = manager.wordpress_health_check()
+print(health["checks"])
 PYEOF
 ```
 
----
+### Fazer Backup Rápido
 
-## ⚠️ ACHADOS CRÍTICOS
-
-### Arquivos Suspeitos Encontrados (6)
-```
-fdqaczzn.php       (19.5 KB - Sep 6)
-innrlfms.php       (7.3 KB - Sep 2)
-memmlpch.php       (12.7 KB - Sep 10)
-qdgvmhua.php       (10.5 KB - Sep 8)
-qdksfqyc.php       (19.5 KB - Sep 12)
-znhtzrxn.php       (21 KB - Sep 11)
-```
-
-**Ação recomendada**: 
-- [ ] Verificar conteúdo desses arquivos
-- [ ] Se forem malware, deletar
-- [ ] Atualizar WordPress
-
----
-
-## 📋 Informações do Site
-
-| Item | Status |
-|------|--------|
-| **WordPress** | Instalado (versão desconhecida) |
-| **Tema Ativo** | Elementor / Hello Elementor |
-| **Plugins** | 17 instalados |
-| **Debug Mode** | ATIVADO (⚠️ desativar em produção) |
-| **File Edit** | Desabilitado ✅ |
-| **Estrutura** | /public_html (padrão) |
-
----
-
-## 🔧 Procedimentos Comuns
-
-### Ler Arquivo
-```python
-# Via MCP Server ou manual
-python -c "
-from mcp_betinalimpeza_server import get_client
-client = get_client()
-print(client.read_file('wp-config.php'))
-"
-```
-
-### Editar Arquivo PHP
 ```bash
-# 1. Baixar via FTP
-# 2. Editar localmente
-# 3. Fazer upload
+python << 'PYEOF'
+from mcp_locaweb_server import LocalWebManager
+import os
 
-# Ou via MCP Server em uma linha
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")
+manager = LocalWebManager()
+
+backup = manager.backup_config()
+print(f"Backup: {backup['backup_path']}")
+PYEOF
 ```
 
-### Limpar Cache WordPress
+### Escanear Malware
+
 ```bash
-# Via FTP: deletar wp-content/cache
-# Ou: chamar wp-cli se disponível
+python << 'PYEOF'
+from mcp_locaweb_server import LocalWebManager
+import os
+
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")
+manager = LocalWebManager()
+
+malware = manager.scan_malware_patterns()
+print(f"Arquivos suspeitos: {malware['count']}")
+for f in malware['suspicious_files']:
+    print(f"  - {f}")
+PYEOF
 ```
 
----
+### Ler/Editar Arquivo
 
-## 🔐 Credenciais
-
-```
-FTP Host: 187.45.240.49
-FTP User: betinalimpeza
-FTP Pass: verificar no cofre
-```
-
-**Nota**: Nunca commitar credenciais. Usar variáveis de ambiente:
 ```bash
-export BETINA_FTP_PASSWORD="xxx"
+python << 'PYEOF'
+from mcp_locaweb_server import LocalWebManager
+import os
+
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")
+manager = LocalWebManager()
+
+# Ler
+result = manager.read_file("public_html/wp-config.php")
+print(result["content"][:500])
+
+# Editar
+new_content = "<?php // Novo conteúdo ?>"
+manager.write_file("public_html/teste.php", new_content)
+
+# Deletar
+manager.delete_file("public_html/arquivo.php")
+PYEOF
+```
+
+### SSH Direto (se ativo)
+
+```bash
+# Via MCP
+python << 'PYEOF'
+from mcp_locaweb_server import LocalWebManager
+import os
+
+os.environ["BETINA_LOCAWEB_SSH_ENABLED"] = "true"
+manager = LocalWebManager()
+result = manager.execute_ssh("ls -la public_html")
+print(result["stdout"])
+PYEOF
+
+# OU direto SSH
+ssh -i ~/.ssh/id_rsa_betinalimpeza \
+    -o HostKeyAlgorithms=ssh-rsa \
+    betinalimpeza@187.45.240.49 \
+    "whoami"
 ```
 
 ---
 
-## 📞 Suporte
+## 📊 Status do WordPress
 
-- **Painel Locaweb**: https://painelhospedagem.locaweb.com.br/dashboard/8291801
-- **cPanel**: https://betinalimpeza.com.br:2083
-- **Diretório Raiz**: /home/betinalimpeza/public_html/
+| Item | Status | Detalhes |
+|------|--------|----------|
+| **Versão** | ✅ 6.9.4 | Atualizado |
+| **Tema** | ✅ Elementor | Hello Elementor |
+| **Plugins** | 17 | Verificar em wp-content/plugins |
+| **Debug** | ⚠️ Legado | PHP 5.2.17 (antigo) |
+| **Segurança** | ✅ OK | DISALLOW_FILE_EDIT ativado |
+| **Config** | ✅ OK | wp-config.php funcional |
 
 ---
 
-## ✅ Checklist Inicial
+## 🔧 Estrutura do Repositório
 
-- [ ] MCP Server testado
-- [ ] Auditoria executada
-- [ ] Arquivos suspeitos analisados
-- [ ] Backup criado antes de edições
-- [ ] SSH/FTP configurado para automação
+```
+C:\GitHubLocal\SITE\
+├── mcp_locaweb_server.py      (Servidor MCP)
+├── MCP.md                      (Docs MCP - 650 linhas)
+├── CLAUDE.md                   (Este arquivo)
+├── test_mcp.sh                 (Testes)
+├── .env.example                (Template)
+├── .env                        (Credenciais - local)
+├── COFRE.md                    (Backup credenciais - local)
+├── .gitignore                  (Proteção .env/.ssh)
+├── .git/                       (Repositório Git)
+└── public_html/                (Arquivos WordPress)
+    ├── wp-config.php
+    ├── .htaccess
+    ├── index.php
+    ├── wp-load.php
+    ├── wp-settings.php
+    ├── wp-mail.php
+    ├── wp-signup.php
+    ├── wp-activate.php
+    ├── wp-blog-header.php
+    ├── wp-content/             (estrutura)
+    ├── wp-admin/               (estrutura)
+    └── wp-includes/            (estrutura)
+```
+
+---
+
+## 📱 Como Usar Este Repositório
+
+### Para Novos Desenvolvedores
+
+1. **Clonar repositório**
+   ```bash
+   git clone https://github.com/tmr6583/SITE.git
+   cd SITE
+   ```
+
+2. **Copiar template de credenciais**
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Preencher credenciais** (solicitar ao proprietário)
+   ```bash
+   # Editar .env com os valores reais
+   # FTP password e SSH key path
+   ```
+
+4. **Testar acesso**
+   ```bash
+   source .env
+   bash test_mcp.sh
+   ```
+
+5. **Usar MCP Server**
+   ```bash
+   python mcp_locaweb_server.py
+   ```
+
+### Para CI/CD (GitHub Actions, etc)
+
+1. **Usar GitHub Secrets**
+   ```yaml
+   env:
+     BETINA_LOCAWEB_PASSWORD: ${{ secrets.BETINA_LOCAWEB_PASSWORD }}
+     BETINA_LOCAWEB_SSH_KEY: ${{ secrets.BETINA_LOCAWEB_SSH_KEY }}
+   ```
+
+2. **Nunca commitar .env**
+   ```bash
+   # Já protegido pelo .gitignore
+   # Verificar antes de fazer push
+   git status | grep .env  # Deve estar vazio
+   ```
+
+---
+
+## 🚨 Troubleshooting
+
+### SSH Não Funciona
+- Verificar se está ativado no painel (3 horas)
+- FTP funcionará como fallback automático
+- Verificar IP: `nslookup betinalimpeza.com.br`
+
+### FTP Não Funciona
+- Verificar credenciais em COFRE.md
+- Testar porta 21 aberta
+- Usar MCP Server que trata erros
+
+### IP Mudou
+- MCP Server detecta automaticamente via DNS
+- Se problema persistir: `export BETINA_LOCAWEB_IP=<novo_ip>`
+
+---
+
+## 📞 Referências
+
+| Item | Link |
+|------|------|
+| **Painel Locaweb** | https://painelhospedagem.locaweb.com.br/dashboard/8291801 |
+| **cPanel** | https://betinalimpeza.com.br:2083 |
+| **Site** | https://betinalimpeza.com.br |
+| **GitHub** | https://github.com/tmr6583/SITE |
+| **Suporte** | https://www.locaweb.com.br/painel/support |
+
+---
+
+## ✅ Checklist Operacional
+
+**Antes de começar:**
+- [ ] .env criado com credenciais
+- [ ] SSH ativado no painel (se necessário)
+- [ ] MCP Server testado (`python mcp_locaweb_server.py`)
+
+**Para manutenção:**
+- [ ] Backup realizado (`manager.backup_config()`)
+- [ ] Malware scaneado (`manager.scan_malware_patterns()`)
+- [ ] Health check executado (`manager.wordpress_health_check()`)
+- [ ] Mudanças testadas localmente
+
+**Antes de fazer push:**
+- [ ] .env NÃO está staged (`git status`)
+- [ ] COFRE.md NÃO está staged
+- [ ] SSH keys NÃO estão staged
+- [ ] Commit message descritiva
+- [ ] Push para GitHub
+
+---
+
+## 📚 Documentação
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| **MCP.md** | Setup, operações, troubleshooting do MCP Server |
+| **CLAUDE.md** | Este arquivo (contexto do projeto) |
+| **COFRE.md** | Referência segura de credenciais (local) |
+| **.env.example** | Template público de configuração |
+
+---
+
+**Versão**: 2.0  
+**Última Atualização**: 2026-09-17  
+**Status**: ✅ Operacional com MCP Server completo
 
