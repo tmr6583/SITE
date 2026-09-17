@@ -213,8 +213,19 @@ PYEOF
 
 ### SSH Direto (se ativo)
 
+**⚠️ IMPORTANTE: SSH precisa estar ativado no painel (válido 3 horas)**
+
 ```bash
-# Via MCP
+# FORMA RECOMENDADA (usa alias do ~/.ssh/config)
+ssh betinalimpeza "whoami"
+
+# OU forma completa
+ssh -i ~/.ssh/id_rsa_betinalimpeza \
+    -o HostKeyAlgorithms=ssh-rsa \
+    betinalimpeza@187.45.240.49 \
+    "whoami"
+
+# OU via MCP Server
 python << 'PYEOF'
 from mcp_locaweb_server import LocalWebManager
 import os
@@ -224,13 +235,12 @@ manager = LocalWebManager()
 result = manager.execute_ssh("ls -la public_html")
 print(result["stdout"])
 PYEOF
-
-# OU direto SSH
-ssh -i ~/.ssh/id_rsa_betinalimpeza \
-    -o HostKeyAlgorithms=ssh-rsa \
-    betinalimpeza@187.45.240.49 \
-    "whoami"
 ```
+
+**Qual método usar?**
+- `ssh betinalimpeza` = Recomendado (mais simples)
+- Forma completa = Se alias não funcionar
+- MCP Server = Para automação/scripts
 
 ---
 
