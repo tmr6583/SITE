@@ -3,6 +3,12 @@
 .env.local
 .env.*.local
 
+# Vault/Credentials (NEVER commit!)
+COFRE.md
+COFRE*.md
+vault.md
+secrets.md
+
 # Python
 __pycache__/
 *.py[cod]
