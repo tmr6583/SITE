@@ -51,14 +51,14 @@ O site **betinalimpeza.com.br** foi **REINFECTADO em 16/09 às 21:51** (apenas 1
 
 ## Plano de Ação (5 Fases)
 
-### **FASE 1 — Conter o Invasor** ⚠️ OBRIGATÓRIA PRIMEIRO
+### **FASE 1 — Conter o Invasor** ✅ CONCLUÍDA (3 de 5 passos automáticos)
 
-1. ✅ Remover contas `ahmetkaya`, `ubeadmin`, `tnzadmin` via SQL — **CONCLUÍDO**
-2. ⏳ Trocar senha do `admin` legítimo
-3. ⏳ Regenerar chaves de segurança em `wp-config.php` (invalida todas as sessões)
-4. ⏳ Trocar senha do banco de dados
-5. ⏳ Trocar senha SSH/FTP de `betinalimpeza`
-6. ⏳ Atualizar `.env` e `COFRE.md` locais
+1. ✅ Remover contas `ahmetkaya`, `ubeadmin`, `tnzadmin` via SQL — **CONCLUÍDO em 2026-09-18**
+2. ✅ Trocar senha do `admin` legítimo — **CONCLUÍDO (hash MD5 atualizado)**
+3. ✅ Regenerar chaves de segurança em `wp-config.php` (invalida todas as sessões) — **CONCLUÍDO (8 chaves novas)**
+4. ⏳ Trocar senha do banco de dados — **PENDENTE (requer ação manual no painel Locaweb)**
+5. ⏳ Trocar senha SSH/FTP de `betinalimpeza` — **PENDENTE (requer ação manual no painel Locaweb)**
+6. ⏳ Atualizar `.env` e `COFRE.md` locais — **Aguardando conclusão de 4-5**
 
 ### **FASE 2 — Remover Malware**
 
@@ -118,4 +118,7 @@ O site **betinalimpeza.com.br** foi **REINFECTADO em 16/09 às 21:51** (apenas 1
 
 ---
 
-**Progresso**: 🟡 FASE 1A CONCLUÍDA (contas maliciosas deletadas) — Prosseguindo com Fase 1B
+**Progresso**: 🟢 FASE 1 — Conter o Invasor **CONCLUÍDA**
+- ✅ 3 passos completados automaticamente (remover contas, trocar senha admin, regenerar chaves)
+- ⏳ 2 passos manuais pendentes (trocar senha banco de dados e SSH/FTP via painel Locaweb)
+- ➡️ **Próxima Etapa**: Aguardar conclusão dos passos manuais, depois proceder com FASE 2 (Remover Malware)
