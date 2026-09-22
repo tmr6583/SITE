@@ -1,8 +1,8 @@
 # MCP Locaweb - Betinalimpeza.com.br
 
-**Versão**: 1.0  
-**Última Atualização**: 2026-09-17  
-**Status**: ✅ Operacional (SSH + FTP)
+**Versão**: 1.1  
+**Última Atualização**: 2026-09-18  
+**Status**: ✅ Operacional (SSH + FTP) — ⚠️ Ver Pontos Críticos 3 e 4 abaixo
 
 ---
 
@@ -71,6 +71,26 @@ ip = socket.gethostbyname("betinalimpeza.com.br")
 
 ---
 
+### 3️⃣ 🚨 CRÍTICO — Credencial exposta no histórico do Git (repositório público)
+
+Em auditoria de 2026-09-18, confirmou-se que este repositório (`github.com/tmr6583/SITE`) é **público** e que uma versão anterior deste arquivo (commit `c0aef3a`) continha a senha FTP/SSH de `betinalimpeza` **em texto plano**. O texto já foi removido da versão atual do arquivo, mas **permanece visível no histórico do Git** para qualquer pessoa com acesso ao repositório.
+
+**Impacto**: essa credencial deve ser tratada como **comprometida**, independentemente de já ter sido trocada. Ver `PLANO.md` (nova fase de remediação) para o plano de ação — trocar a senha (se ainda não trocada) e considerar reescrever o histórico do Git (`git filter-repo`/BFG) como medida adicional, mediante confirmação explícita antes de qualquer reescrita de histórico.
+
+**Regra a partir de agora**: nenhuma credencial real deve ser escrita neste arquivo ou em qualquer arquivo versionado. Usar sempre `<verificar no cofre de secrets/vault>` como placeholder nos exemplos.
+
+---
+
+### 4️⃣ ⚠️ DNS do domínio não aponta para o IP compartilhado atual
+
+Verificado em 2026-09-18: o painel Locaweb reporta o **IP Compartilhado atual como `187.45.240.49`** e sinaliza **"DNS: Configurar"** e **"Certificado SSL: DNS Pendente"**. Testes de resolução (via DNS interno e via 8.8.8.8/1.1.1.1) mostram que `betinalimpeza.com.br` resolve hoje para **`187.45.240.67`** — um IP diferente do IP compartilhado atual do painel.
+
+Na prática o site **ainda funciona** (ambos os IPs `.49` e `.67` respondem com o mesmo certificado Let's Encrypt válido, `notAfter=2026-10-14`), mas o painel não reconhece a configuração de DNS como concluída — o que tende a **bloquear a renovação automática do certificado SSL** no próximo ciclo. Ver `PLANO.md` para o plano de correção do DNS.
+
+Isso também afeta a função `resolve_ip()` do `mcp_locaweb_server.py`: hoje ela resolveria para `.67`, não para o IP compartilhado `.49` informado pelo painel — mantenha o IP configurado explicitamente via `BETINA_LOCAWEB_IP`/`.env` em vez de depender só da resolução DNS enquanto essa divergência não for corrigida.
+
+---
+
 ## 🚀 Setup Inicial
 
 ### Pré-requisitos
@@ -91,7 +111,7 @@ cat > .env << 'EOF'
 BETINA_LOCAWEB_IP=187.45.240.49
 BETINA_LOCAWEB_HOST=187.45.240.49
 BETINA_LOCAWEB_USER=betinalimpeza
-BETINA_LOCAWEB_PASSWORD=Esquilo08!!!!!
+BETINA_LOCAWEB_PASSWORD=<verificar no cofre de secrets/vault - COFRE.md local>
 
 # SSH (quando ativo no painel)
 BETINA_LOCAWEB_SSH_USER=betinalimpeza
@@ -106,7 +126,7 @@ source .env  # ou: set -a && source .env && set +a (bash/zsh)
 
 **Windows (PowerShell):**
 ```powershell
-$env:BETINA_LOCAWEB_PASSWORD = "Esquilo08!!!!!"
+$env:BETINA_LOCAWEB_PASSWORD = "<verificar no cofre de secrets/vault>"
 $env:BETINA_LOCAWEB_SSH_ENABLED = "false"
 ```
 
@@ -235,7 +255,7 @@ print(f"Backup em: {backup['backup_path']}")
 ### 1. Verificar Status do Site
 
 ```bash
-export BETINA_LOCAWEB_PASSWORD="Esquilo08!!!!!"
+export BETINA_LOCAWEB_PASSWORD="<verificar no cofre de secrets/vault>"
 python << 'PYEOF'
 from mcp_locaweb_server import LocalWebManager
 
@@ -256,7 +276,7 @@ python << 'PYEOF'
 import os
 from mcp_locaweb_server import LocalWebManager
 
-os.environ["BETINA_LOCAWEB_PASSWORD"] = "Esquilo08!!!!!"
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")  # ver cofre de secrets/vault
 manager = LocalWebManager()
 
 # Backup de múltiplos arquivos críticos
@@ -283,7 +303,7 @@ python << 'PYEOF'
 import os
 from mcp_locaweb_server import LocalWebManager
 
-os.environ["BETINA_LOCAWEB_PASSWORD"] = "Esquilo08!!!!!"
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")  # ver cofre de secrets/vault
 manager = LocalWebManager()
 
 # Escanear
@@ -308,7 +328,7 @@ python << 'PYEOF'
 import os
 from mcp_locaweb_server import LocalWebManager
 
-os.environ["BETINA_LOCAWEB_PASSWORD"] = "Esquilo08!!!!!"
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")  # ver cofre de secrets/vault
 manager = LocalWebManager()
 
 # Ler atual
@@ -337,7 +357,7 @@ PYEOF
 
 ```bash
 export BETINA_LOCAWEB_SSH_ENABLED=true
-export BETINA_LOCAWEB_PASSWORD="Esquilo08!!!!!"
+export BETINA_LOCAWEB_PASSWORD="<verificar no cofre de secrets/vault>"
 
 python << 'PYEOF'
 from mcp_locaweb_server import LocalWebManager
@@ -451,7 +471,7 @@ python << 'PYEOF'
 from mcp_locaweb_server import LocalWebManager
 import os
 
-os.environ["BETINA_LOCAWEB_PASSWORD"] = "Esquilo08!!!!!"
+os.environ["BETINA_LOCAWEB_PASSWORD"] = os.getenv("BETINA_LOCAWEB_PASSWORD")  # ver cofre de secrets/vault
 manager = LocalWebManager()
 
 # Tentar via SSH (mais seguro)
@@ -475,7 +495,7 @@ export BETINA_LOCAWEB_PASSWORD="..."
 python mcp_locaweb_server.py
 
 # ❌ Errado: Hardcoded no código
-password = "Esquilo08!!!!!"
+password = os.environ["BETINA_LOCAWEB_PASSWORD"]  # ver cofre de secrets/vault
 ```
 
 **Guardar em local seguro:**
@@ -590,7 +610,7 @@ ssh -i ~/.ssh/id_rsa_betinalimpeza \
 
 # FTP direto
 ftp 187.45.240.49
-# Login: betinalimpeza / Esquilo08!!!!!
+# Login: betinalimpeza / <verificar no cofre de secrets/vault>
 ```
 
 ---
@@ -602,7 +622,12 @@ ftp 187.45.240.49
 | **Painel Locaweb** | https://painelhospedagem.locaweb.com.br/dashboard/8291801 |
 | **cPanel** | https://betinalimpeza.com.br:2083 |
 | **Site** | https://betinalimpeza.com.br |
-| **Diretório Raiz** | /home/betinalimpeza/public_html |
+| **Domínio temporário** | betinalimpeza.hospedagemdesites.ws |
+| **SSL compartilhado** | https://betinalimpeza.websiteseguro.com |
+| **Diretório Raiz (painel)** | /home/betinalimpeza/ |
+| **Diretório Raiz (real, via SSH)** | /home/storage2/b/f0/5b/betinalimpeza/public_html |
+| **Plano de Hospedagem** | Hospedagem I (contratado em 07/03/2016) |
+| **IP Compartilhado (painel)** | 187.45.240.49 |
 | **Ticket Suporte** | https://www.locaweb.com.br/painel/support |
 
 ---
@@ -623,9 +648,10 @@ ftp 187.45.240.49
 | Data | Mudança |
 |------|---------|
 | 2026-09-17 | v1.0 - Lançamento inicial (SSH + FTP + Fallback) |
+| 2026-09-18 | v1.1 - Removidas senhas em texto plano dos exemplos (achado crítico: histórico do Git é público); adicionados dados do painel (plano, domínio temporário, SSL compartilhado); documentada divergência de DNS (`.67` resolvido vs `.49` IP compartilhado do painel) |
 
 ---
 
-**Última Atualização**: 2026-09-17  
+**Última Atualização**: 2026-09-18  
 **Mantido por**: Infraestrutura (Claude Code)  
-**Status**: ✅ Operacional
+**Status**: ✅ Operacional — pendências de segurança documentadas em `PLANO.md`
