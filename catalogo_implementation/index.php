@@ -1,29 +1,25 @@
 <?php
 /**
- * index.php - Catálogo dinâmico por vendedora (PHP 5.6+ compatível)
+ * index.php - Catálogo dinâmico por vendedora (V6: Substituição de paths)
  */
 
 define('CATALOG_FILE', __DIR__ . '/me.html');
 define('DEFAULT_VENDOR', 'adriana');
+define('CATALOG_URL', 'https://betinalimpeza.com.br/HTML/catalogo');
 
 require_once __DIR__ . '/vendedoras.php';
 
-// Sanitizar slug
 function sanitize_slug($slug) {
     $slug = strtolower(trim($slug));
-    $slug = preg_replace('/[^a-z0-9\-_]/', '', $slug);
-    return $slug;
+    return preg_replace('/[^a-z0-9\-_]/', '', $slug);
 }
 
-// Formatar para WhatsApp
 function format_whatsapp_number($phone) {
     return preg_replace('/[^0-9]/', '', $phone);
 }
 
-// Extrair vendedora da URL
 $vendedora_slug = isset($_GET['vendedora']) ? sanitize_slug($_GET['vendedora']) : DEFAULT_VENDOR;
 
-// Buscar dados da vendedora
 $vendor_data = get_vendedora($vendedora_slug);
 if (!$vendor_data) {
     $vendor_data = get_vendedora(DEFAULT_VENDOR);
@@ -32,7 +28,6 @@ if (!$vendor_data) {
 $phone = $vendor_data['telefone'];
 $phone_formatted = format_whatsapp_number($phone);
 
-// Carregar catálogo
 if (!file_exists(CATALOG_FILE)) {
     http_response_code(500);
     echo "Erro: Catálogo não encontrado.";
@@ -41,7 +36,29 @@ if (!file_exists(CATALOG_FILE)) {
 
 $html = file_get_contents(CATALOG_FILE);
 
-// Criar script de injeção de WhatsApp
+// CORREÇÃO V6: Substituir paths relativos por absolutos
+// produtos.js
+$html = str_replace(
+    '<script src="produtos.js"></script>',
+    '<script src="' . CATALOG_URL . '/produtos.js"></script>',
+    $html
+);
+
+// imagens - atualizar src="/imagens/" para "/HTML/catalogo/imagens/"
+$html = str_replace(
+    'src="imagens/',
+    'src="' . CATALOG_URL . '/imagens/',
+    $html
+);
+
+// links para xlsx - se houver
+$html = str_replace(
+    'href="imagens/',
+    'href="' . CATALOG_URL . '/imagens/',
+    $html
+);
+
+// Script de injeção de WhatsApp
 $script = "\n" .
 "<script>" . "\n" .
 "window.VENDOR_PHONE = '" . $phone_formatted . "';" . "\n" .
@@ -63,10 +80,8 @@ $script = "\n" .
 "};" . "\n" .
 "</script>" . "\n";
 
-// Inserir script antes de </body>
 $html = str_replace('</body>', $script . '</body>', $html);
 
-// Enviar
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: no-cache, no-store, must-revalidate');
 echo $html;
