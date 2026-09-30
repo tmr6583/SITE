@@ -1,6 +1,6 @@
 <?php
 /**
- * index.php - Catálogo dinâmico por vendedora (V8: Corrigir paths de imagens antes da renderização)
+ * index.php - Catálogo dinâmico por vendedora (V9: Substituir placeholder externo por SVG)
  */
 
 define('CATALOG_FILE', __DIR__ . '/me.html');
@@ -44,13 +44,23 @@ $html = str_replace('href="imagens/', 'href="' . CATALOG_URL . '/imagens/', $htm
 $html = str_replace("url('imagens/", "url('" . CATALOG_URL . "/imagens/", $html);
 $html = str_replace('url("imagens/', 'url("' . CATALOG_URL . '/imagens/', $html);
 
-// Script que corrige paths de imagens ANTES e DEPOIS da renderização
+// CORREÇÃO V9: Substituir placeholder externo (via.placeholder.com) por SVG inline
+// O problema: via.placeholder.com retorna 404
+// A solução: usar um SVG base64 como data URI que SEMPRE funciona
+$svg_placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5TZW0gRm90bzwvdGV4dD48L3N2Zz4=';
+
+// Substituir o onerror que tenta usar via.placeholder.com
+$old_onerror = "onerror=\"this.src='https://via.placeholder.com/200?text=Sem+Foto'\"";
+$new_onerror = "onerror=\"this.src='" . $svg_placeholder . "'\"";
+$html = str_replace($old_onerror, $new_onerror, $html);
+
+// Script que corrige paths de imagens
 $script = "\n" .
 "<script>" . "\n" .
 "window.VENDOR_PHONE = '" . $phone_formatted . "';" . "\n" .
 "window.CATALOG_URL = '" . CATALOG_URL . "';" . "\n" .
 "" . "\n" .
-"// Função para corrigir paths de imagens em allProducts" . "\n" .
+"// Corrigir paths de imagens em allProducts antes de renderizar" . "\n" .
 "function fixImagePaths() {" . "\n" .
 "  if (typeof allProducts !== 'undefined' && Array.isArray(allProducts)) {" . "\n" .
 "    allProducts.forEach(function(p) {" . "\n" .
@@ -63,7 +73,7 @@ $script = "\n" .
 "  }" . "\n" .
 "}" . "\n" .
 "" . "\n" .
-"// Executar assim que allProducts estiver disponível" . "\n" .
+"// Executar quando allProducts carregar" . "\n" .
 "var checkInterval = setInterval(function() {" . "\n" .
 "  if (typeof allProducts !== 'undefined') {" . "\n" .
 "    fixImagePaths();" . "\n" .
@@ -71,7 +81,7 @@ $script = "\n" .
 "  }" . "\n" .
 "}, 100);" . "\n" .
 "" . "\n" .
-"// Também corrigir no onload" . "\n" .
+"// Também executar no onload" . "\n" .
 "var originalOnload = window.onload;" . "\n" .
 "window.onload = function() {" . "\n" .
 "  if (originalOnload) {" . "\n" .
@@ -79,7 +89,7 @@ $script = "\n" .
 "  }" . "\n" .
 "  fixImagePaths();" . "\n" .
 "  " . "\n" .
-"  // Corrigir também todas as imagens renderizadas no DOM" . "\n" .
+"  // Corrigir qualquer imagem renderizada no DOM" . "\n" .
 "  setTimeout(function() {" . "\n" .
 "    var imgs = document.querySelectorAll('img[src^=\"imagens/\"]');" . "\n" .
 "    imgs.forEach(function(img) {" . "\n" .
