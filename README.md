@@ -153,4 +153,79 @@ Para o estado atual de segurança, fases já concluídas e pendências: ver [`PL
 
 ---
 
-**Última atualização**: 2026-09-18
+**Última atualização**: 2026-09-30
+
+---
+
+## 9. Catálogos Dinâmicos por Vendedora
+
+### Visão Geral
+
+Sistema implementado que permite **exibir o mesmo catálogo da empresa para múltiplas vendedoras**, mas com **encaminhamento de pedidos específico para o WhatsApp de cada uma**.
+
+**URLs disponíveis:**
+- `https://betinalimpeza.com.br/catalogo/` — Catálogo (pedidos → Adriana)
+- `https://betinalimpeza.com.br/catalogo/adriana` — Catálogo (pedidos → Adriana)
+- `https://betinalimpeza.com.br/catalogo/simone` — Catálogo (pedidos → Simone)
+- `https://betinalimpeza.com.br/catalogo/silvana` — Catálogo (pedidos → Silvana)
+- `https://betinalimpeza.com.br/catalogo/mariaeduarda` — Catálogo (pedidos → MariaEduarda)
+
+### Componentes Técnicos
+
+| Arquivo | Localização | Propósito |
+|---------|-----------|-----------|
+| `index.php` V11 | `/HTML/catalogo/index.php` | Router dinâmico com URL encoding |
+| `vendedoras.php` | `/HTML/catalogo/vendedoras.php` | Base de dados PHP com array de vendedoras |
+| `me.html` | `/HTML/catalogo/me.html` | Catálogo HTML completo (estático) |
+| `produtos.js` | `/HTML/catalogo/produtos.js` | Dados de produtos em JSON |
+| `Vendedoras.md` | Raiz do repositório | Documentação de vendedoras (referência legível) |
+| `.htaccess` (rewrite rules) | `/public_html/.htaccess` | Apache rewrite: `/catalogo/X` → `/HTML/catalogo/index.php?vendedora=X` |
+| `redirect-catalog-link.php` | `/wp-content/mu-plugins/` | Must-Use Plugin que altera link "Catálogo" da homepage |
+
+### Versão Atual: V11 (2026-09-30)
+
+**Problema resolvido**: Imagens com caracteres especiais (Ç, Á, É, etc) não carregavam porque o servidor esperava URLs com encoding.
+
+**Solução**: JavaScript automático que faz `encodeURIComponent()` em TODOS os nomes de arquivo:
+- Exemplo: `AÇÚCAR_UNIÃO_PREMIUM.jpg` → `A%C3%87%DCAR_UNI%C3%83O_PREMIUM.jpg`
+- Resultado: Imagens agora carregam corretamente em todos os catálogos de vendedora
+
+**Histórico de versões:**
+- **V7**: Corrigir paths de imagens para absolutos
+- **V8-V9**: Adicionar SVG base64 para placeholder "Sem Foto" (substituir via.placeholder.com)
+- **V10**: ❌ Quebrou o site (rollback para V7)
+- **V11**: ✅ Adicionar URL encoding para caracteres especiais (CURRENT)
+
+### Como Usar
+
+#### Acessar catálogo de vendedora
+1. Clique no botão "Catálogo" na homepage de betinalimpeza.com.br
+2. Ou navegue direto para: `https://betinalimpeza.com.br/catalogo/[nome-vendedora]`
+3. Ao encaminhar um pedido via WhatsApp, a mensagem vai para o número da vendedora
+
+#### Adicionar nova vendedora
+1. Abra `/HTML/catalogo/vendedoras.php`
+2. Adicione entrada ao array `$vendedoras`:
+   ```php
+   'novavendedora' => [
+       'nome' => 'Nome Completo',
+       'telefone' => '5524XXXXXXXXX'
+   ]
+   ```
+3. Upload do arquivo
+4. URL automática disponível: `/catalogo/novavendedora`
+
+#### Alterar catálogo inteiro (produtos, descrições, layout)
+1. Edite `/HTML/catalogo/me.html` ou `/HTML/catalogo/produtos.js`
+2. Upload
+3. Mudança reflete **automaticamente em TODAS as URLs** (`/catalogo/`, `/catalogo/adriana`, etc.)
+
+### Documentação Relacionada
+
+- [`Vendedoras.md`](Vendedoras.md) — Cadastro de vendedoras (tabela legível)
+- [`catalogo_implementation/README.md`](catalogo_implementation/README.md) — Documentação técnica completa
+- [`Contexto.md`](Contexto.md) — Seção 4 (detalhes arquiteturais)
+
+---
+
+**Última atualização**: 2026-09-30

@@ -2,8 +2,8 @@
 
 Documento de contexto unificado para o projeto betinalimpeza.com.br. Consolida infraestrutura, configurações, memórias de decisões anteriores e status operacional — referência única para qualquer inteligência, desenvolvedor ou pessoa que trabalhe neste projeto.
 
-**Última atualização**: 2026-09-23  
-**Status**: ✅ Operacional (com pendências de segurança — ver seção 5)
+**Última atualização**: 2026-09-30  
+**Status**: ✅ Operacional (catálogos dinâmicos implementados, pendências de segurança em seção 5)
 
 ---
 
@@ -148,8 +148,8 @@ EOF
 ## 4. 🛍️ Catálogos Dinâmicos por Vendedora
 
 **Status**: ✅ Homologado e em Produção  
-**Versão**: 1.2 (Corrigido e Testado em 2026-09-30)  
-**Testes**: ✅ Suite completa validada - Fase 1-2 concluída
+**Versão**: 1.3 (V11 — URL encoding para caracteres especiais, implementado 2026-09-30)  
+**Testes**: ✅ Suite completa validada; imagens com Ç, Á, É, etc agora carregam corretamente
 
 ### Descrição
 
@@ -191,22 +191,28 @@ RewriteRule ^catalogo/?$ /HTML/catalogo/index.php [QSA,L]
 
 Referência: [Vendedoras.md](Vendedoras.md)
 
-| # | Nome | Telefone | URL |
-|---|------|----------|-----|
-| 1 | Adriana | +55 24 98854-1099 | `/catalogo/adriana` |
-| 2 | MariaEduarda | +55 24 98854-1099 | `/catalogo/mariaeduarda` |
-| 3 | Simone | +55 24 99229-8532 | `/catalogo/simone` |
-| 4 | Silvana | +55 24 98854-1098 | `/catalogo/silvana` |
+| # | Nome | Telefone | URL | Status |
+|---|------|----------|-----|--------|
+| 1 | Adriana | +55 24 98854-1099 | `/catalogo/adriana` | ✅ Ativa |
+| 2 | MariaEduarda | +55 24 98854-1101 | `/catalogo/mariaeduarda` | ✅ Ativa |
+| 3 | Simone | +55 24 99229-8532 | `/catalogo/simone` | ✅ Ativa |
+| 4 | Silvana | +55 24 98854-1098 | `/catalogo/silvana` | ✅ Ativa |
 
-### Como Funciona
+### Como Funciona (V11 — com URL Encoding)
 
 1. **URL chega**: `/catalogo/adriana`
 2. **Apache reescreve** para: `/HTML/catalogo/index.php?vendedora=adriana`
 3. **PHP lê** `me.html` (catálogo completo - 702 linhas, 34.5 KB)
 4. **PHP busca** dados da vendedora em `vendedoras.php`
-5. **PHP injeta** script que define `window.VENDOR_PHONE = '5524988541099'`
-6. **Função `sendWhatsApp()`** é sobrescrita para usar este número
-7. **Página renderizada**: Idêntica para todas as vendedoras, apenas WhatsApp muda
+5. **PHP injeta** script JavaScript que:
+   - Define `window.VENDOR_PHONE = '5524988541099'`
+   - Define `window.CATALOG_URL = 'https://betinalimpeza.com.br/HTML/catalogo'`
+   - **Faz `encodeURIComponent()` em TODOS os nomes de arquivo** antes de construir URLs finais
+   - Corrige imagens com caracteres especiais (Ç, Á, É, etc) automaticamente
+   - Sobrescreve função `sendWhatsApp()` para usar número da vendedora
+6. **Página renderizada**: Idêntica para todas as vendedoras; apenas WhatsApp e encoding de imagem muda
+
+**Solução V11**: Caracteres especiais em nomes de arquivo (ex: `AÇÚCAR_UNIÃO.jpg`) agora são convertidos para URL-safe (ex: `A%C3%87%DCAR_UNI%C3%83O.jpg`) antes de requisitar ao servidor
 
 ### Adicionar Nova Vendedora
 
@@ -221,6 +227,17 @@ Referência: [Vendedoras.md](Vendedoras.md)
 3. Fazer upload
 4. URLs automáticas disponíveis:
    - `/catalogo/novavendedora` → Catálogo com pedidos para esta vendedora
+
+### Botão "Catálogo" da Homepage
+
+**Status**: ✅ Implementado com Must-Use Plugin (2026-09-30)
+
+O botão/link "Catálogo" da página inicial do betinalimpeza.com.br (criado em Elementor) agora aponta para `/catalogo`:
+- Arquivo: `/wp-content/mu-plugins/redirect-catalog-link.php`
+- Método: JavaScript na tag `wp_footer` que altera `href` no navegador
+- Usuário vê URL como: `https://betinalimpeza.com.br/catalogo`
+
+Quando clicado, o catálogo é exibido com pedidos encaminhados para a vendedora **Adriana** (padrão).
 
 ### Alterar Catálogo Inteiro
 
