@@ -1,6 +1,6 @@
 <?php
 /**
- * index.php - Catálogo dinâmico por vendedora (V6: Substituição de paths)
+ * index.php - Catálogo dinâmico por vendedora (V8: Corrigir paths de imagens antes da renderização)
  */
 
 define('CATALOG_FILE', __DIR__ . '/me.html');
@@ -36,32 +36,61 @@ if (!file_exists(CATALOG_FILE)) {
 
 $html = file_get_contents(CATALOG_FILE);
 
-// CORREÇÃO V6: Substituir paths relativos por absolutos
-// produtos.js
-$html = str_replace(
-    '<script src="produtos.js"></script>',
-    '<script src="' . CATALOG_URL . '/produtos.js"></script>',
-    $html
-);
+// Substituir paths de recursos
+$html = str_replace('<script src="produtos.js"></script>',
+    '<script src="' . CATALOG_URL . '/produtos.js"></script>', $html);
+$html = str_replace('src="imagens/', 'src="' . CATALOG_URL . '/imagens/', $html);
+$html = str_replace('href="imagens/', 'href="' . CATALOG_URL . '/imagens/', $html);
+$html = str_replace("url('imagens/", "url('" . CATALOG_URL . "/imagens/", $html);
+$html = str_replace('url("imagens/', 'url("' . CATALOG_URL . '/imagens/', $html);
 
-// imagens - atualizar src="/imagens/" para "/HTML/catalogo/imagens/"
-$html = str_replace(
-    'src="imagens/',
-    'src="' . CATALOG_URL . '/imagens/',
-    $html
-);
-
-// links para xlsx - se houver
-$html = str_replace(
-    'href="imagens/',
-    'href="' . CATALOG_URL . '/imagens/',
-    $html
-);
-
-// Script de injeção de WhatsApp
+// Script que corrige paths de imagens ANTES e DEPOIS da renderização
 $script = "\n" .
 "<script>" . "\n" .
 "window.VENDOR_PHONE = '" . $phone_formatted . "';" . "\n" .
+"window.CATALOG_URL = '" . CATALOG_URL . "';" . "\n" .
+"" . "\n" .
+"// Função para corrigir paths de imagens em allProducts" . "\n" .
+"function fixImagePaths() {" . "\n" .
+"  if (typeof allProducts !== 'undefined' && Array.isArray(allProducts)) {" . "\n" .
+"    allProducts.forEach(function(p) {" . "\n" .
+"      if (p.imagem && p.imagem.indexOf('http') !== 0) {" . "\n" .
+"        if (p.imagem.indexOf('imagens/') === 0) {" . "\n" .
+"          p.imagem = window.CATALOG_URL + '/' + p.imagem;" . "\n" .
+"        }" . "\n" .
+"      }" . "\n" .
+"    });" . "\n" .
+"  }" . "\n" .
+"}" . "\n" .
+"" . "\n" .
+"// Executar assim que allProducts estiver disponível" . "\n" .
+"var checkInterval = setInterval(function() {" . "\n" .
+"  if (typeof allProducts !== 'undefined') {" . "\n" .
+"    fixImagePaths();" . "\n" .
+"    clearInterval(checkInterval);" . "\n" .
+"  }" . "\n" .
+"}, 100);" . "\n" .
+"" . "\n" .
+"// Também corrigir no onload" . "\n" .
+"var originalOnload = window.onload;" . "\n" .
+"window.onload = function() {" . "\n" .
+"  if (originalOnload) {" . "\n" .
+"    originalOnload.call(this);" . "\n" .
+"  }" . "\n" .
+"  fixImagePaths();" . "\n" .
+"  " . "\n" .
+"  // Corrigir também todas as imagens renderizadas no DOM" . "\n" .
+"  setTimeout(function() {" . "\n" .
+"    var imgs = document.querySelectorAll('img[src^=\"imagens/\"]');" . "\n" .
+"    imgs.forEach(function(img) {" . "\n" .
+"      var src = img.getAttribute('src');" . "\n" .
+"      if (src.indexOf('http') !== 0) {" . "\n" .
+"        img.setAttribute('src', window.CATALOG_URL + '/' + src);" . "\n" .
+"      }" . "\n" .
+"    });" . "\n" .
+"  }, 500);" . "\n" .
+"};" . "\n" .
+"" . "\n" .
 "window.sendWhatsApp = function() {" . "\n" .
 "  if (typeof cart === 'undefined' || cart.length === 0) {" . "\n" .
 "    alert('Carrinho vazio. Adicione produtos primeiro.');" . "\n" .
