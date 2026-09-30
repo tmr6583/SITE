@@ -145,20 +145,24 @@ EOF
 
 ---
 
-## 4. 🛍️ Catálogos Dinâmicos de Vendedoras
+## 4. 🛍️ Catálogos Dinâmicos por Vendedora
 
-**Status**: ✅ Implementado em 2026-09-30  
-**Versão**: 1.0
+**Status**: ✅ Implementado em 2026-09-30 (Versão Corrigida)  
+**Versão**: 1.1 (Corrigido em 2026-09-30)
 
 ### Descrição
 
-Sistema de catálogos elegantes para vendedoras com URLs clean e links automáticos de WhatsApp.
+Sistema elegante onde **um único catálogo da empresa** é servido para todas as vendedoras, mas o botão "encaminhar pedido" direciona para o WhatsApp específico de cada vendedora.
 
-**URLs geradas**:
+**Conceito**: O catálogo é **idêntico** para todas as URLs; apenas o número de WhatsApp para encaminhamento de pedidos muda dinamicamente.
+
+**URLs**:
 ```
-https://betinalimpeza.com.br/catalogo/              (lista todas as vendedoras)
-https://betinalimpeza.com.br/catalogo/adriana       (catálogo individual)
-https://betinalimpeza.com.br/catalogo/simone        (etc...)
+https://betinalimpeza.com.br/catalogo/              → Catálogo empresa (pedido → Adriana)
+https://betinalimpeza.com.br/catalogo/adriana       → Catálogo empresa (pedido → Adriana)
+https://betinalimpeza.com.br/catalogo/simone        → Catálogo empresa (pedido → Simone)
+https://betinalimpeza.com.br/catalogo/silvana       → Catálogo empresa (pedido → Silvana)
+https://betinalimpeza.com.br/catalogo/mariaeduarda  → Catálogo empresa (pedido → MariaEduarda)
 ```
 
 ### Arquivos
@@ -195,25 +199,34 @@ Referência: [Vendedoras.md](Vendedoras.md)
 
 ### Como Funciona
 
-1. URL chega: `/catalogo/adriana`
-2. Apache reescreve para: `/HTML/catalogo/index.php?vendedora=adriana`
-3. PHP carrega `vendedoras.php` e busca dados
-4. Template renderiza HTML com dados da vendedora
-5. Links WhatsApp são construídos dinamicamente: `https://wa.me/55{numero}`
+1. **URL chega**: `/catalogo/adriana`
+2. **Apache reescreve** para: `/HTML/catalogo/index.php?vendedora=adriana`
+3. **PHP lê** `me.html` (catálogo completo - 702 linhas, 34.5 KB)
+4. **PHP busca** dados da vendedora em `vendedoras.php`
+5. **PHP injeta** script que define `window.VENDOR_PHONE = '5524988541099'`
+6. **Função `sendWhatsApp()`** é sobrescrita para usar este número
+7. **Página renderizada**: Idêntica para todas as vendedoras, apenas WhatsApp muda
 
 ### Adicionar Nova Vendedora
 
 1. Editar `/HTML/catalogo/vendedoras.php`
 2. Adicionar entrada ao array `$vendedoras`:
    ```php
-   'novvendedora' => [
+   'novavendedora' => [
        'nome' => 'Nome Completo',
        'telefone' => '5524XXXXXXXXX',
-       'descricao' => 'Breve descrição',
    ]
    ```
-3. Fazer upload do arquivo
-4. URL estará disponível automaticamente: `/catalogo/novavendedora`
+3. Fazer upload
+4. URLs automáticas disponíveis:
+   - `/catalogo/novavendedora` → Catálogo com pedidos para esta vendedora
+
+### Alterar Catálogo Inteiro
+
+Mudanças no catálogo (produtos, descrições, layout):
+1. Editar `/HTML/catalogo/me.html` diretamente
+2. Upload
+3. **Reflete automaticamente em TODAS as URLs** (`/catalogo/`, `/catalogo/adriana`, etc.)
 
 ### Documentação
 
