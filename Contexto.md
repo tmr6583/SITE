@@ -145,9 +145,86 @@ EOF
 
 ---
 
-## 4. 📊 WordPress & Aplicação
+## 4. 🛍️ Catálogos Dinâmicos de Vendedoras
 
-### 4.1 Configuração Atual
+**Status**: ✅ Implementado em 2026-09-30  
+**Versão**: 1.0
+
+### Descrição
+
+Sistema de catálogos elegantes para vendedoras com URLs clean e links automáticos de WhatsApp.
+
+**URLs geradas**:
+```
+https://betinalimpeza.com.br/catalogo/              (lista todas as vendedoras)
+https://betinalimpeza.com.br/catalogo/adriana       (catálogo individual)
+https://betinalimpeza.com.br/catalogo/simone        (etc...)
+```
+
+### Arquivos
+
+| Arquivo | Local | Propósito | Tamanho |
+|---------|-------|-----------|--------|
+| `index.php` | `/HTML/catalogo/index.php` | Router dinâmico principal | ~12 KB |
+| `vendedoras.php` | `/HTML/catalogo/vendedoras.php` | Base de dados PHP com array | ~2 KB |
+| `Vendedoras.md` | Repositório raiz | Cadastro legível de vendedoras | ~1 KB |
+
+### Rewrite Rules (.htaccess)
+
+Adicionadas ao `/public_html/.htaccess`:
+
+```apache
+#### START Catálogos Dinâmicos
+
+RewriteRule ^catalogo/(.+?)/?$ /HTML/catalogo/index.php?vendedora=$1 [QSA,L]
+RewriteRule ^catalogo/?$ /HTML/catalogo/index.php [QSA,L]
+
+#### END Catálogos Dinâmicos
+```
+
+### Vendedoras Cadastradas
+
+Referência: [Vendedoras.md](Vendedoras.md)
+
+| # | Nome | Telefone | URL |
+|---|------|----------|-----|
+| 1 | Adriana | +55 24 98854-1099 | `/catalogo/adriana` |
+| 2 | MariaEduarda | +55 24 98854-1099 | `/catalogo/mariaeduarda` |
+| 3 | Simone | +55 24 99229-8532 | `/catalogo/simone` |
+| 4 | Silvana | +55 24 98854-1098 | `/catalogo/silvana` |
+
+### Como Funciona
+
+1. URL chega: `/catalogo/adriana`
+2. Apache reescreve para: `/HTML/catalogo/index.php?vendedora=adriana`
+3. PHP carrega `vendedoras.php` e busca dados
+4. Template renderiza HTML com dados da vendedora
+5. Links WhatsApp são construídos dinamicamente: `https://wa.me/55{numero}`
+
+### Adicionar Nova Vendedora
+
+1. Editar `/HTML/catalogo/vendedoras.php`
+2. Adicionar entrada ao array `$vendedoras`:
+   ```php
+   'novvendedora' => [
+       'nome' => 'Nome Completo',
+       'telefone' => '5524XXXXXXXXX',
+       'descricao' => 'Breve descrição',
+   ]
+   ```
+3. Fazer upload do arquivo
+4. URL estará disponível automaticamente: `/catalogo/novavendedora`
+
+### Documentação
+
+Completa em: [catalogo_implementation/README.md](catalogo_implementation/README.md)  
+Plano de deployment: [catalogo_implementation/DEPLOYMENT_PLAN.md](catalogo_implementation/DEPLOYMENT_PLAN.md)
+
+---
+
+## 5. 📊 WordPress & Aplicação
+
+### 5.1 Configuração Atual
 
 | Item | Status | Detalhes |
 |------|--------|----------|
@@ -184,7 +261,7 @@ public_html/
 
 ---
 
-## 5. 🚨 Segurança & Status de Remediação
+## 6. 🚨 Segurança & Status de Remediação
 
 ### 5.1 Reinfecções por Malware (contexto histórico)
 
@@ -241,7 +318,7 @@ Documento: [`PLANO.md`](PLANO.md) — Diagnóstico completo + 6 fases de remedia
 
 ---
 
-## 6. 📁 Estrutura do Repositório
+## 7. 📁 Estrutura do Repositório
 
 ```
 SITE/ (github.com/tmr6583/SITE — repositório PÚBLICO)
@@ -285,7 +362,7 @@ SITE/ (github.com/tmr6583/SITE — repositório PÚBLICO)
 
 ---
 
-## 7. 🔐 Credenciais & Segurança
+## 8. 🔐 Credenciais & Segurança
 
 ### 7.1 Onde as Credenciais Ficam
 

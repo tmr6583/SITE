@@ -1,0 +1,26 @@
+# ======================================
+# .htaccess - Seção de Catálogos Dinâmicos
+# ======================================
+#
+# LOCAL: Adicionar as linhas abaixo ao arquivo /public_html/.htaccess
+# POSIÇÃO: Após as linhas do WordPress, mas ANTES de "#### END WordPress"
+#
+# Estas regras devem ser inseridas na ordem correta para não conflitar com
+# as regras existentes do WordPress.
+#
+# Data: 2026-09-30
+# Versão: 1.0
+
+# #### START Catálogos Dinâmicos
+#
+# Regra 1: Redirecionar /catalogo/{slug} para /HTML/catalogo/index.php?vendedora={slug}
+# Esta regra captura URLs elegantes como /catalogo/adriana e passa para o router PHP
+#
+# Exemplos:
+#   /catalogo/adriana        → /HTML/catalogo/index.php?vendedora=adriana
+#   /catalogo/simone?foo=bar → /HTML/catalogo/index.php?vendedora=simone&foo=bar
+#
+RewriteRule ^catalogo/(.+?)/?$ /HTML/catalogo/index.php?vendedora=$1 [QSA,L]
+RewriteRule ^catalogo/?$ /HTML/catalogo/index.php [QSA,L]
+
+# #### END Catálogos Dinâmicos
