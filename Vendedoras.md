@@ -10,7 +10,7 @@
 | # | Nome | Telefone | Slug URL | Status |
 |---|------|----------|----------|--------|
 | 1 | Adriana | +55 24 98854-1099 | `/catalogo/adriana` | ✅ Ativa |
-| 2 | MariaEduarda | +55 24 98854-1099 | `/catalogo/mariaeduarda` | ✅ Ativa |
+| 2 | MariaEduarda | +55 24 98854-1101 | `/catalogo/mariaeduarda` | ✅ Ativa |
 | 3 | Simone | +55 24 99229-8532 | `/catalogo/simone` | ✅ Ativa |
 | 4 | Silvana | +55 24 98854-1098 | `/catalogo/silvana` | ✅ Ativa |
 
