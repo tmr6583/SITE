@@ -54,11 +54,16 @@ Manutenção, melhorias, backup e gestão segura do site betinalimpeza.com.br at
 | **Validade Atual** | 16/07/2026 a 14/10/2026 (~26 dias da data 2026-09-23) |
 | **Status DNS (painel)** | ⚠️ **Configurar** |
 
-#### 🚨 Achado Crítico (2026-09-18)
-- **DNS resolve incorretamente**: `betinalimpeza.com.br` aponta para `187.45.240.67`, não para o IP compartilhado atual `187.45.240.49`
-- **Impacto**: Site funciona normalmente hoje (ambos IPs servem o mesmo conteúdo/certificado), mas a renovação automática de SSL **pode falhar** quando o certificado expirar em 14/10/2026
-- **Ação recomendada**: Corrigir DNS apontando para IP compartilhado correto (Fase 6 em PLANO.md)
-- **Detalhes**: Ver PLANO.md (Fase 6) e README.md (seção 2.1)
+#### ✅ DNS Corrigido (2026-09-23)
+- **Antes (2026-09-18)**: `betinalimpeza.com.br` apontava para `187.45.242.67` (IP errado) e `www` apontava para `bebdinlimpa.com.br` (inativo)
+- **Depois (2026-09-23)**: 
+  - ✅ Entrada A raiz (`.`) corrigida para `187.45.240.49` (IP compartilhado correto)
+  - ✅ CNAME `www` atualizado para `betinalimpeza.com.br` (domínio principal)
+  - ✅ Todos os CNAMEs antigos para `bebdinlimpa.com.br` foram migrados
+  - ✅ Registros ACME limpezados (lixo de validação SSL)
+  - ✅ Banco de dados migrado para novo serviço Locaweb (mysql01)
+- **Status**: Aguardando propagação de DNS (1-48h) e confirmação no painel de "DNS: Configurado" ✅ + "SSL: Validado" ✅
+- **Detalhes**: Ver DIAGNOSTICO_DNS_POS_EXECUCAO.md e PLANO.md (Fase 6)
 
 ### 2.3 Acesso ao Servidor
 

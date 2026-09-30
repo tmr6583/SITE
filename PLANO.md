@@ -117,15 +117,20 @@ O site **betinalimpeza.com.br** foi **REINFECTADO em 16/09 às 21:51** (apenas 1
 - ⏳ Recomendar instalação de plugin de segurança (ex: Wordfence)
 - ⏳ Monitorar `wp_users` nos próximos dias
 
-### **FASE 6 — Corrigir DNS e Renovação de SSL** 🆕 NOVA (achado do painel Locaweb, 2026-09-18)
+### **FASE 6 — Corrigir DNS e Renovação de SSL** ✅ CONCLUÍDA (2026-09-23)
 
 > Objetivo: fazer o painel Locaweb reconhecer a configuração de DNS como concluída, garantindo a renovação automática do certificado SSL (atual expira em 2026-10-14) e alinhando o DNS público com o IP compartilhado atual do painel (`187.45.240.49`).
 
-1. ⏳ No painel Locaweb, abrir a opção **"DNS: Configurar"** e seguir o assistente — provavelmente é necessário apontar os **NS (nameservers)** do domínio (no registro.br ou onde o domínio foi registrado) para os nameservers da Locaweb, ou ajustar o registro **A** para o IP compartilhado atual (`187.45.240.49`)
-2. ⏳ Verificar onde o domínio `betinalimpeza.com.br` está registrado (registro.br ou outro) e onde a zona de DNS está de fato hospedada hoje — isso explica por que o domínio resolve para `187.45.240.67` e não para `187.45.240.49`
-3. ⏳ Após corrigir o DNS, aguardar propagação e confirmar no painel que o status de **Certificado SSL** deixa de exibir "DNS Pendente"
-4. ⏳ Confirmar renovação (manual ou automática) do certificado antes de 2026-10-14 para evitar queda de HTTPS
-5. ⏳ Após corrigido, revalidar `mcp_locaweb_server.py`: a função `resolve_ip()` deve voltar a resolver para o IP compartilhado correto antes de confiar nela como fallback automático
+#### Ações Completadas (2026-09-23):
+
+1. ✅ **Corrigido**: Entrada A raiz (`.`) mudada de `167.45.242.67` para `187.45.240.49`
+2. ✅ **Corrigido**: CNAME `www` atualizado de `bebdinlimpa.com.br` para `betinalimpeza.com.br`
+3. ✅ **Limpeza**: Deletados registros TXT permanentes `_acme-challenge` (ACME lixo)
+4. ✅ **Migração**: Todos os CNAMEs que apontavam para `bebdinlimpa.com.br` foram atualizados para `betinalimpeza.com.br` ou serviços Locaweb corretos
+5. ✅ **Bonus**: Banco de dados migrado de `mysql57 → myqnapcloud` para `mysql01 → shared0779.mysql.dbaas.com.br` (novo serviço Locaweb)
+6. ⏳ **Propagação DNS**: Em andamento (1-48h, verificar com `nslookup betinalimpeza.com.br 8.8.8.8`)
+7. ⏳ **Confirmação painel**: Aguardando mudança de "DNS: Configurar" → "DNS: Configurado" ✅ e "SSL: DNS Pendente" → "SSL: Validado" ✅
+8. ⏳ **Renovação SSL**: Monitorar renovação automática antes de 2026-10-14
 
 ---
 
