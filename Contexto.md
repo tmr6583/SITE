@@ -3,7 +3,7 @@
 Documento de contexto unificado para o projeto betinalimpeza.com.br. Consolida infraestrutura, configurações, memórias de decisões anteriores e status operacional — referência única para qualquer inteligência, desenvolvedor ou pessoa que trabalhe neste projeto.
 
 **Última atualização**: 2026-10-01  
-**Status**: ✅ **Operacional + Backup Completo** (catálogos V15, Git LFS, scripts restore, pendências segurança em seção 6)
+**Status**: ✅ **Operacional + Backup Completo 100%** (1.449 imagens + banco SQL versionados, Git LFS ativo, pronto para restauração rápida)
 
 ---
 
@@ -324,14 +324,15 @@ SITE/
     └── validate_integrity.sh ← Validação de integridade
 ```
 
-### 5.2 Tamanho
+### 5.2 Tamanho (Dados Reais — 2026-10-01)
 
 | Componente | Tamanho | Notas |
 |-----------|---------|-------|
 | Repositório Git | ~55 MB | Código + documentação |
-| Git LFS (imagens) | ~300 MB | Pointers no Git = ~50 KB |
-| Git LFS (banco SQL) | ~20 MB | Comprimido |
-| **Total GitHub** | **~375 MB** | vs. 1.2 GB original |
+| Git LFS (imagens WordPress) | 4.7 MB | 94 uploads (pointers: ~10 KB) |
+| Git LFS (imagens catálogo) | 120 MB | 1.355 produtos (pointers: ~50 KB) |
+| Git LFS (banco SQL gzip) | 1 KB | betinalimpeza.sql.gz (comprimido) |
+| **Total GitHub** | **~180 MB** | vs. 1.2 GB original (-85%) |
 
 ### 5.3 Como Usar
 
