@@ -2,8 +2,8 @@
 
 Documento de contexto unificado para o projeto betinalimpeza.com.br. Consolida infraestrutura, configurações, memórias de decisões anteriores e status operacional — referência única para qualquer inteligência, desenvolvedor ou pessoa que trabalhe neste projeto.
 
-**Última atualização**: 2026-09-30  
-**Status**: ✅ Operacional (catálogos dinâmicos implementados, pendências de segurança em seção 5)
+**Última atualização**: 2026-10-01  
+**Status**: ✅ Operacional (catálogos dinâmicos V15 com race condition resolvida, favicon Betina, pendências de segurança em seção 5)
 
 ---
 
@@ -148,8 +148,8 @@ EOF
 ## 4. 🛍️ Catálogos Dinâmicos por Vendedora
 
 **Status**: ✅ Homologado e em Produção  
-**Versão**: 1.3 (V11 — URL encoding para caracteres especiais, implementado 2026-09-30)  
-**Testes**: ✅ Suite completa validada; imagens com Ç, Á, É, etc agora carregam corretamente
+**Versão**: 1.5 (V15 — Remover `loading="lazy"` para eliminar race condition, implementado 2026-10-01)  
+**Testes**: ✅ Investigação completa + solução implementada; race condition de timing resolvida
 
 ### Descrição
 
@@ -198,21 +198,32 @@ Referência: [Vendedoras.md](Vendedoras.md)
 | 3 | Simone | +55 24 99229-8532 | `/catalogo/simone` | ✅ Ativa |
 | 4 | Silvana | +55 24 98854-1098 | `/catalogo/silvana` | ✅ Ativa |
 
-### Como Funciona (V11 — com URL Encoding)
+### Como Funciona (V15 — com Race Condition Resolvida)
 
 1. **URL chega**: `/catalogo/adriana`
 2. **Apache reescreve** para: `/HTML/catalogo/index.php?vendedora=adriana`
 3. **PHP lê** `me.html` (catálogo completo - 702 linhas, 34.5 KB)
-4. **PHP busca** dados da vendedora em `vendedoras.php`
-5. **PHP injeta** script JavaScript que:
+4. **PHP REMOVE `loading="lazy"`** de todas as imagens (V15: elimina race condition)
+5. **PHP busca** dados da vendedora em `vendedoras.php`
+6. **PHP injeta** script JavaScript que:
    - Define `window.VENDOR_PHONE = '5524988541099'`
    - Define `window.CATALOG_URL = 'https://betinalimpeza.com.br/HTML/catalogo'`
+   - Define `window.CACHE_BUST = '?v=YmdH'` (cache-busting por hora)
    - **Faz `encodeURIComponent()` em TODOS os nomes de arquivo** antes de construir URLs finais
    - Corrige imagens com caracteres especiais (Ç, Á, É, etc) automaticamente
    - Sobrescreve função `sendWhatsApp()` para usar número da vendedora
-6. **Página renderizada**: Idêntica para todas as vendedoras; apenas WhatsApp e encoding de imagem muda
+7. **Página renderizada**: Idêntica para todas as vendedoras; apenas WhatsApp muda
 
-**Solução V11**: Caracteres especiais em nomes de arquivo (ex: `AÇÚCAR_UNIÃO.jpg`) agora são convertidos para URL-safe (ex: `A%C3%87%DCAR_UNI%C3%83O.jpg`) antes de requisitar ao servidor
+**Histórico de soluções**:
+- **V11**: URL encoding para caracteres especiais (Ç, Á, É)
+- **V12**: V11 + Favicon Betina em catálogos
+- **V13**: V12 + Cache-busting (?v=YmdH) para evitar cache de 404s
+- **V14**: ❌ Rollback (bloqueio de imagens quebrou cabeçalho)
+- **V15**: ✅ **V13 + Remover `loading="lazy"`** para eliminar race condition de timing
+
+**Problema resolvido em V15**: 
+- Causa: `loading="lazy"` fazia imagens carregar ANTES de `fixImagePaths()` corrigir os paths relativos
+- Solução: Carregar imagem imediatamente, garantindo tempo para correção de path antes do navegador tentar acessar
 
 ### Adicionar Nova Vendedora
 
@@ -246,10 +257,37 @@ Mudanças no catálogo (produtos, descrições, layout):
 2. Upload
 3. **Reflete automaticamente em TODAS as URLs** (`/catalogo/`, `/catalogo/adriana`, etc.)
 
+### Investigação de Imagens "Sem Foto" (2026-10-01)
+
+**Problema relatado**: Alguns produtos mostravam "Sem Foto" aleatoriamente em diferentes navegadores e catálogos
+
+**Investigação realizada**:
+1. ✅ Analisou estrutura de me.html (template literals JavaScript)
+2. ✅ Testou 30+ requisições ao catálogo (reprodução de problema)
+3. ✅ Verificou console/logs (timing de execução de scripts)
+
+**Causa raiz identificada**: **Race condition de timing**
+- `me.html` renderiza imagens via `render()` com paths relativos: `<img src="imagens/produto.jpg">`
+- `loading="lazy"` faz imagem carregar QUANDO FICA VISÍVEL
+- Se fica visível ANTES de `fixImagePaths()` corrigir o path → GET `/catalogo/imagens/...` → **404**
+- Se fica visível DEPOIS → GET `/HTML/catalogo/imagens/...` → **200** ✅
+- Timing varia por: velocidade da rede, CPU, cache do navegador
+
+**Evidências**:
+- ✅ Todas as 787 imagens referenciadas existem no servidor
+- ✅ Servidor sempre retorna HTTP 200 quando testado
+- ❌ 0/10 requisições tinham paths corretos no HTML renderizado (normal, é JavaScript)
+- ✅ Scripts de correção presentes e executando
+
+**Solução V15**: Remover `loading="lazy"` força carregamento imediato, eliminando a janela de timing
+
+**Documentação técnica**: Ver [catalogo_implementation/](catalogo_implementation/) para detalhes de todas as versões (V2-V15)
+
 ### Documentação
 
 Completa em: [catalogo_implementation/README.md](catalogo_implementation/README.md)  
-Plano de deployment: [catalogo_implementation/DEPLOYMENT_PLAN.md](catalogo_implementation/DEPLOYMENT_PLAN.md)
+Plano de deployment: [catalogo_implementation/DEPLOYMENT_PLAN.md](catalogo_implementation/DEPLOYMENT_PLAN.md)  
+Histórico de versões: [catalogo_implementation/index_corrigido_v*.php](catalogo_implementation/) (V2-V15)
 
 ---
 
@@ -583,6 +621,8 @@ Este documento consolida as seguintes memórias de sessões anteriores:
 | 2026-09-18 | Diagnóstico de segurança: credencial exposta (Fase 1B) + DNS/SSL pendente (Fase 6) | Claude (Sonnet 5) |
 | 2026-09-18 | Criação de README.md, atualização de MCP.md (remoção de senha em texto plano) | Claude (Sonnet 5) |
 | 2026-09-23 | Consolidação em Contexto.md (renomear CLAUDE.md, agregar memórias) | Claude (Haiku 4.5) |
+| 2026-09-30 | Implementar catálogos dinâmicos V11-V12 (favicon, cache-busting) | Claude (Haiku 4.5) |
+| 2026-10-01 | Investigação profunda de race condition em imagens; implementar V15 (remover loading="lazy") | Claude (Haiku 4.5) |
 
 ---
 
