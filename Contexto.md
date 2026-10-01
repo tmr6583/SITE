@@ -3,7 +3,7 @@
 Documento de contexto unificado para o projeto betinalimpeza.com.br. Consolida infraestrutura, configurações, memórias de decisões anteriores e status operacional — referência única para qualquer inteligência, desenvolvedor ou pessoa que trabalhe neste projeto.
 
 **Última atualização**: 2026-10-01  
-**Status**: ✅ Operacional (catálogos dinâmicos V15 com race condition resolvida, favicon Betina, pendências de segurança em seção 5)
+**Status**: ✅ **Operacional + Backup Completo** (catálogos V15, Git LFS, scripts restore, pendências segurança em seção 6)
 
 ---
 
@@ -288,6 +288,90 @@ Mudanças no catálogo (produtos, descrições, layout):
 Completa em: [catalogo_implementation/README.md](catalogo_implementation/README.md)  
 Plano de deployment: [catalogo_implementation/DEPLOYMENT_PLAN.md](catalogo_implementation/DEPLOYMENT_PLAN.md)  
 Histórico de versões: [catalogo_implementation/index_corrigido_v*.php](catalogo_implementation/) (V2-V15)
+
+---
+
+## 5. 📦 Backup Completo — Git LFS + Scripts
+
+**Status**: ✅ Implementado (Release 3.0 — 2026-10-01)
+
+### 5.1 Estrutura de Backup
+
+Sistema completo de backup no GitHub para restauração rápida se Locaweb falhar:
+
+```
+SITE/
+├── .gitattributes           ← Configuração Git LFS
+├── BACKUP_PLAN.md           ← Planejamento de 9 seções (~600 linhas)
+├── web-backup/
+│   ├── README.md            ← Como usar backup de arquivos
+│   ├── .htaccess            ← Rewrite rules (catálogos dinâmicos)
+│   ├── wp-config.php.example ← Template sanitizado
+│   ├── wp-content/
+│   │   └── uploads/         ← Imagens WordPress (~200 MB, Git LFS)
+│   └── HTML/catalogo/
+│       ├── index.php        ← Router V15
+│       ├── vendedoras.php   ← Base de dados vendedoras
+│       ├── me.html          ← Catálogo estático
+│       ├── produtos.js      ← 787 produtos
+│       └── imagens/         ← Imagens de produtos (~100 MB, Git LFS)
+├── database-backup/
+│   ├── README.md            ← Como usar backup SQL
+│   └── betinalimpeza_YYYYMMDD.sql.gz (~20 MB, Git LFS)
+└── scripts/
+    ├── backup_full.sh       ← Download conteúdo do servidor
+    ├── restore_full.sh      ← Restauração automatizada em novo servidor
+    └── validate_integrity.sh ← Validação de integridade
+```
+
+### 5.2 Tamanho
+
+| Componente | Tamanho | Notas |
+|-----------|---------|-------|
+| Repositório Git | ~55 MB | Código + documentação |
+| Git LFS (imagens) | ~300 MB | Pointers no Git = ~50 KB |
+| Git LFS (banco SQL) | ~20 MB | Comprimido |
+| **Total GitHub** | **~375 MB** | vs. 1.2 GB original |
+
+### 5.3 Como Usar
+
+#### Backup (Periódico)
+```bash
+# 1. Ativar SSH no painel Locaweb (válido 3 horas)
+# https://painelhospedagem.locaweb.com.br/dashboard/8291801
+
+# 2. Fazer backup
+bash scripts/backup_full.sh
+
+# 3. Push para GitHub
+git add web-backup/ database-backup/
+git commit -m "Backup: Conteúdo sincronizado (YYYYMMDD)"
+git push origin 3.0
+```
+
+#### Restauração (Novo Servidor)
+```bash
+# Clonar + restaurar completo (1 comando)
+git clone https://github.com/tmr6583/SITE.git
+cd SITE && git lfs pull
+bash scripts/restore_full.sh seu-dominio.com admin senha db_user db_pass
+```
+
+### 5.4 Validação
+
+```bash
+# Verificar integridade do backup
+bash scripts/validate_integrity.sh
+```
+
+Verifica: Git LFS ✓, imagens ✓, banco SQL ✓, estrutura ✓
+
+### 5.5 Git LFS (Large File Storage)
+
+- **Ativado**: Rastreia imagens + arquivos comprimidos
+- **Configuração**: `.gitattributes` (incluso no repo)
+- **Tamanho limite**: GitHub oferece 1 GB/mês gratuito (suficiente)
+- **Status**: ✅ Configurado e testado
 
 ---
 
