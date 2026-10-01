@@ -7,7 +7,8 @@ Gerencia manutenção, melhorias e alterações do site via SSH/FTP
 Usos:
     python mcp_locaweb_server.py                    # Inicia servidor MCP
     export BETINA_LOCAWEB_IP=187.45.240.49          # Sobrescreve IP (opcional)
-    export BETINA_LOCAWEB_SSH_ENABLED=true          # Ativa SSH
+    export BETINA_LOCAWEB_SSH_ENABLED=true          # Ativa SSH (depois ativar no painel)
+    ssh betina                                      # Conectar direto (atalho rápido pós-ativação)
 """
 
 import os

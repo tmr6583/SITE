@@ -73,8 +73,8 @@ Manutenção, melhorias, backup e gestão segura do site betinalimpeza.com.br at
 - ✅ Operações avançadas (chown, chmod, etc.)
 - ⚠️ **Válido por apenas 3 horas** após ativação manual no painel
 - **Como ativar**: https://painelhospedagem.locaweb.com.br/dashboard/8291801 → Hospedagem → Ambientes → Acesso → SSH (checkbox)
-- **Após ativar**: Defina `BETINA_LOCAWEB_SSH_ENABLED=true` e execute no terminal: `ssh betinalimpeza "whoami"`
-- **Alias configurado**: `ssh betinalimpeza` (recomendado, usa `~/.ssh/config`)
+- **Após ativar no painel**: Basta digitar **`ssh betina`** no terminal (atalho rápido via `~/.ssh/config`)
+- **Alternativa**: Defina `BETINA_LOCAWEB_SSH_ENABLED=true` e execute `python mcp_locaweb_server.py`
 
 #### FTP (sempre disponível)
 - ✅ Leitura/escrita de arquivos

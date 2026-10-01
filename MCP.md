@@ -62,11 +62,16 @@ ip = socket.gethostbyname("betinalimpeza.com.br")
 4. Confirmar e aguardar ~1 minuto
 5. Executar no terminal:
    ```bash
+   ssh betina              # ⚡ Atalho rápido (recomendado após ativar no painel)
+   ```
+   Ou via MCP Server:
+   ```bash
    export BETINA_LOCAWEB_SSH_ENABLED=true
    python mcp_locaweb_server.py
    ```
 
-**Duração:** SSH permanece ativo por **3 horas** após ativação
+**Duração:** SSH permanece ativo por **3 horas** após ativação  
+**Atalho Rápido:** Após ativar SSH no painel, basta digitar **`ssh betina`** para conectar (via `~/.ssh/config`)  
 **Fallback:** Se SSH não está disponível, o MCP usa FTP automaticamente
 
 ---
