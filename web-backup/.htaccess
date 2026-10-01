@@ -1,0 +1,31 @@
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+
+#### START Catálogos Dinâmicos
+# Rotas para catálogos dinâmicos (V15)
+# Reescreve URLs como /catalogo/adriana para index.php com parâmetro
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^catalogo/(.+?)/?$ /HTML/catalogo/index.php?vendedora=$1 [QSA,L]
+RewriteRule ^catalogo/?$ /HTML/catalogo/index.php [QSA,L]
+
+#### END Catálogos Dinâmicos
+
+# Cache headers para imagens
+<FilesMatch "\.(jpg|jpeg|png|gif|svg|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+
+# Compressão GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
